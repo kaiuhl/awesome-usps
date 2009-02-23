@@ -1,97 +1,89 @@
 module FotoVerite #:nodoc:
   class USPS
     class Location
-
-      attr_reader :options,
-      :country,
-      :name,
-      :last_name,
-      :firm_name,
-      :zip5,
-      :zip4,
-      :state,
-      :city,
-      :address1,
-      :address2,
-      :address3,
-      :phone,
-      :facility_type,
-      :from_urbanization
-      #:fax,
-      #:address_type
-
-      alias_method :postal_code, :zip5
-      alias_method :postal, :postal_code
-      alias_method :zip, :postal
-      alias_method :province, :state
-      alias_method :territory, :province
-      alias_method :region, :province
-      alias_method :first_name, :name
-
-      def initialize(options = {})
-        @country = options[:country]
-        @name = options[:name] || options[:first_name]
-        @last_name= options[:last_name]
-        @firm_name = options[:firm_name]
-        @zip5 = options[:postal_code] || options[:postal] || options[:zip5]
-        @zip4 = options[:zip4]
-        @state = options[:province] || options[:state]
-        @city = options[:city]
-        @address1 = options[:address1]
-        @address2 = options[:address2]
-        @address3=options [:address3]
-        @phone = options[:phone]
-        @facility_type = options[:facility_type]
-        @from_urbanization =options[:from_urbanization]
+      
+      @@valid_attributes = %w(
+        first_name
+        last_name
+        firm_name
+        address1
+        address2
+        address3
+        city
+        state
+        zip5
+        zip4
+        country
+        phone
+        facility_type
+        from_urbanization
+      )
+      
+      @@valid_attributes.each do |attr|
+        define_method(attr) { @attributes[attr] }
+        define_method("#{attr}=") {|value| @attributes[attr] = value }
+      end
+      
+      # address 1 and address 2 are actually switched in the USPS API... dumb or what?!
+      %w(address).each do |m|
+        alias_method :"#{m}", :address2
+        alias_method :"#{m}=", :address2=
+      end
+      %w(postal_code postcode postalcode postal zip).each do |m|
+        alias_method :"#{m}", :zip5
+        alias_method :"#{m}=", :zip5=
+      end
+      %w(province territory region).each do |m|
+        alias_method :"#{m}", :state
+        alias_method :"#{m}=", :state=
+      end
+      
+      def self.from(location_or_hash)
+        location_or_hash.is_a?(Location) ? location_or_hash : Location.new(location_or_hash)
       end
 
-      def self.from(object, options={})
-        return object if object.is_a? FotoVerite::Location
-        attr_mappings = {
-          :name => [:name, :first_name],
-          #:country => [:country_code, :country],
-          :zip5 => [:postal_code, :zip5, :postal],
-          :zip4 => [:zip4],
-          :state => [ :province, :state],
-          :city => [:city],
-          :address1 => [:address1],
-          :address2 => [:address2],
-          :facility_type => [:facility_type]
-        }
-        attributes = {}
-        hash_access = begin
-          object[:some_symbol]
-          true
-        rescue
-          false
-        end
-        attr_mappings.each do |pair|
-          pair[1].each do |sym|
-            if value = (object[sym] if hash_access) || (object.send(sym) if object.respond_to?(sym) && (!hash_access || !Hash.public_instance_methods.include?(sym.to_s)))
-              attributes[pair[0]] = value
-              break
-            end
-          end
-        end
-        self.new(attributes.update(options))
+      def initialize(attributes = {})
+        @attributes = {}
+        attributes.each {|k, v| send("#{k}=", v) }
       end
-
-
-      def to_s
-        prettyprint.gsub(/\n/, ' ')
+      
+      def full_name
+        compact(first_name, last_name).join(" ")
       end
-
-      def prettyprint
-        chunks = []
-        chunks << [@name,@firm_name].reject {|e| e.blank?}.join("\n")
-        chunks << [@address1,@address2].reject {|e| e.blank?}.join("\n")
-        chunks << [@city,@state,@zip5].reject {|e| e.blank?}.join(', ')
-        chunks.reject {|e| e.blank?}.join("\n")
+      
+      def full_address
+        compact(address2, address1, address3).join("\n")
+      end
+      
+      def full_zip
+        zip5 + (zip4.blank? ? "" : "-#{zip4}")
       end
 
       def inspect
-        string = prettyprint
-        string
+        "#<#{self.class}:#{self.hash} " +
+        @@valid_attributes.inject([]) {|a,k| v = @attributes[k]; a << "@#{k}=#{v.inspect}" unless v.blank?; a }.join(" ") +
+        ">"
+      end
+
+      def to_s
+        pretty_print.gsub(/\n/, ' ')
+      end
+
+      def pretty_print
+        compact(full_name, firm_name, full_address, city_state_zip).join("\n")
+      end
+      
+    private
+      def city_state
+        compact(city, state).join(", ")
+      end
+      
+      def city_state_zip
+        city_state + " " + full_zip
+      end
+    
+      def compact(*strings)
+        strings.reject(&:blank?)
       end
       
     end # Location

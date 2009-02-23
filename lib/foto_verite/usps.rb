@@ -1,3 +1,34 @@
+module FotoVerite
+  class USPS
+    
+    class Error < StandardError
+      def initialize(exception_or_message=nil)
+        @message = exception_or_message ? (exception_or_message.is_a?(String) ? exception_or_message : exception_or_message.message) : ""
+      end
+      
+      def message
+        @message
+      end
+      alias_method :to_s, :message
+    end
+    class ConnectionError < Error
+      def message
+        "While connecting to the USPS API: #{@message}"
+      end
+    end
+    
+    def initialize(username, options)
+      @username = validate(username)
+      @options = options
+    end
+
+    def validate(param)
+      raise ERROR_MSG if param.blank?
+      param
+    end
+  end
+end
+
 %w(
   package
   location
@@ -19,15 +50,6 @@ end
 
 module FotoVerite
   class USPS
-    def initialize(username)
-      @username = validate(username)
-    end
-
-    def validate(param)
-      raise ERROR_MSG if param.blank?
-      param
-    end
-    
     include Tracking
     include Gateway
     include Shipping
@@ -38,6 +60,5 @@ module FotoVerite
     include ExpressMail
     include AddressVerification
     include InternationalMailLabels
-
   end
 end

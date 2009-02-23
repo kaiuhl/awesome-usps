@@ -1,37 +1,40 @@
 module FotoVerite
   class USPS
     module AddressVerification
-      MAX_RETRIES = 3
-
-      LIVE_DOMAIN = 'production.shippingapis.com'
-      LIVE_RESOURCE = '/ShippingAPI.dll'
-
-      TEST_DOMAIN ='testing.shippingapis.com'
-      TEST_RESOURCE = '/ShippingAPITest.dll'
-
+      
+      class Error < FotoVerite::USPS::Error; end
+      class GeneralAddressFoundError < Error; end
+      class AddressNotFoundError < Error; end
+      
       API_CODES ={
         :verify_address => 'Verify',
         :zip_lookup => 'ZipCodeLookup',
-      :city_state_lookup =>"CityStateLookup"}
+        :city_state_lookup => "CityStateLookup"
+      }
+      
+      TEST_LOCATIONS = [
+        Location.new(:address2 => "6406 Ivy Lane", :city => "Greenbelt", :state => "MD"),
+        Location.new(:address2 => "8 Wildwood Drive", :city => "Old Lyme", :state => "CT", :zip => "06371")
+      ]
 
       # Examines address and fills in missing information. Address must include city & state or the zip to be processed.
       # Can do up to an array of five
-      def veryify_address(locations)
-        locations = Array(locations) if not locations.is_a? Array
+      def verify_address(locations)
+        locations = [locations].flatten.map {|loc| Location.from(loc) }
         api_request = "AddressValidateRequest"
-        request = xml_for_verify_address(api_request, locations)
+        request = xml_for_address_information_api(api_request, locations)
         gateway_commit(:verify_address, 'Verify', request, :live)
       end
 
       def zip_lookup(locations)
-        locations = Array(locations) if not locations.is_a? Array
+        locations = [locations].flatten.map {|loc| Location.from(loc) }
         api_request = "ZipCodeLookupRequest"
         request = xml_for_address_information_api(api_request, locations)
-        gateway_commit(:zip_lookup, 'ZipCodeLookup',request, :live)
+        gateway_commit(:zip_lookup, 'ZipCodeLookup', request, :live)
       end
 
       def city_state_lookup(locations)
-        locations = Array(locations) if not locations.is_a? Array
+        locations = [locations].flatten.map {|loc| Location.from(loc) }
         api_request = "CityStateLookupRequest"
         request = xml_for_address_information_api(api_request, locations)
         gateway_commit(:zip_lookup, 'CityStateLookup', request, :live)
@@ -39,23 +42,20 @@ module FotoVerite
 
 
       def canned_verify_address_test
-        locations = [Location.new(:address2 => "6406 Ivy Lane", :city =>"Greenbelt", :state => "MD"), Location.new(:address2=>"8 Wildwood Drive", :city => "Old Lyme",:state => "CT", :zip5 => "06371"   )]
         api_request = "AddressValidateRequest"
-        request = xml_for_address_information_api(api_request, locations)
+        request = xml_for_address_information_api(api_request, TEST_LOCATIONS)
         gateway_commit(:verify_address, 'Verify', request, :test)
       end
 
       def canned_zip_lookup_test
-        locations = [Location.new(:address2 => "6406 Ivy Lane", :city =>"Greenbelt", :state => "MD"), Location.new(:address2=>"8 Wildwood Drive", :city => "Old Lyme",:state => "CT", :zip5 => "06371"   )]
         api_request = "ZipCodeLookupRequest"
-        request = xml_for_address_information_api(api_request, locations)
+        request = xml_for_address_information_api(api_request, TEST_LOCATIONS)
         gateway_commit(:zip_lookup, 'ZipCodeLookup', request, :test)
       end
 
       def canned_city_state_lookup_test
-        locations = [Location.new(:address2 => "6406 Ivy Lane", :city =>"Greenbelt", :state => "MD"), Location.new(:address2=>"8 Wildwood Drive", :city => "Old Lyme",:state => "CT", :zip5 => "06371")]
         api_request = "CityStateLookupRequest"
-        request = xml_for_address_information_api(api_request, locations)
+        request = xml_for_address_information_api(api_request, TEST_LOCATIONS)
         gateway_commit(:zip_lookup, 'CityStateLookup', request, :test)
       end
 
@@ -84,32 +84,39 @@ module FotoVerite
 
       # Parses the XML into an array broken up by each address.
       # For verify_address :verified will be false if multiple address were found.
+      #--
+      # TODO: This needs to have access to the original location list
       def parse_address_information(xml)
+        #puts "--- Response ---"
+        #puts xml
         i = 0
-        list_of_verified_addresses = []
-        (Hpricot.parse(xml)/:address).each do |address|
-          i+=1
-          h = {}
-          #Check if there was an error in an address element
-          if address.search("error") != []
-            RAILS_DEFAULT_LOGGER.info("Address number #{i} has the error '#{address.search("description").inner_html}' please fix before continuing")
-
-            return "Address number #{i} has the error '#{address.search("description").inner_html}' please fix before continuing"
-          end
-          if address.search("ReturnText") != []
-            h[:verified] = false
+        addresses = []
+        doc = Hpricot.parse(xml)
+        if error = doc.at("error")
+          msg = error.at("description").inner_text
+          if msg =~ /address not found/i
+            raise AddressNotFoundError
           else
-            h[:verified] =true
+            raise Error, "Error during address verification: '#{msg}'"
           end
-          address.children.each { |elem| h[elem.name.to_sym] = elem.inner_text unless elem.inner_text.blank? }
-          list_of_verified_addresses << h
         end
-        #Check if there was an error in the basic XML formating
-        if list_of_verified_addresses == []
-          error =Hpricot.parse(xml)/:error
-          return  error.search("description").inner_html
+        doc.search("address").each_with_index do |address, i|
+          # Check if there was an error in an address element
+          if error =  address.at("error")
+            raise Error, "Error during address verification for address ##{i}: '#{error.at("description").inner_text}'"
+          end
+          if address.at("returntext")
+            # we need an apartment, suite, or box number to really find the address
+            raise GeneralAddressFoundError
+          else
+            addresses << address.children.inject(Location.new) {|loc, elem|
+              next if elem.name == 'returntext'
+              loc.send("#{elem.name}=", elem.inner_text) unless elem.inner_text.blank?
+              loc
+            }
+          end
         end
-        return list_of_verified_addresses
+        return addresses
       end
 
     end # AddressVerification

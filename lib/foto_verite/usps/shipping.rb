@@ -1,12 +1,6 @@
 module FotoVerite
   class USPS
     module Shipping
-
-      MAX_RETRIES = 3
-
-      LIVE_DOMAIN = 'production.shippingapis.com'
-      LIVE_RESOURCE = '/ShippingAPI.dll'
-
       API_CODES = {
         :us_rates => 'RateV3',
         :world_rates => 'IntlRate',
@@ -48,7 +42,6 @@ module FotoVerite
         :library => 'LIBRARY',
         :all => 'ALL'
       }
-
 
       # options Are?
       def domestic_rates(origin_zip, destination_zip, packages, options={})

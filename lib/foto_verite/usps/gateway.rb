@@ -31,8 +31,8 @@ module FotoVerite
         :priority_mail => 'parse_internation_label',
         :first_class_mail => "parse_internation_label",
         :first_class_mail_certify => 'parse_internation_label',
-        :open_distrubute_priority => "parse_open_distrubute_priority",
-        :open_distribute_priority_certify => "parse_open_distrubute_priority",
+        :open_distribute_priority => "parse_open_distribute_priority",
+        :open_distribute_priority_certify => "parse_open_distribute_priority",
         :priority_mail => "parse_service",
         :standard => "parse_service",
         :express => 'parse_express',
@@ -52,7 +52,8 @@ module FotoVerite
       def gateway_commit(action, api, request, http_request, image_type="PDF")
         retries = MAX_RETRIES
         begin
-          url = URI.parse(url_path(http_request))
+          full_url = url_path(http_request)
+          url = URI.parse(full_url)
           req = Net::HTTP::Post.new(url.path)
           req.set_form_data({'API' => api, 'XML' => request})
           http = Net::HTTP.new(url.host, url.port)
@@ -62,6 +63,11 @@ module FotoVerite
             http.use_ssl = true
             http.verify_mode = OpenSSL::SSL::VERIFY_NONE
           end
+          if @options[:debug]
+            puts "--- API method: #{api} ---"
+            puts "--- Sending XML to '#{full_url}' ---"
+            puts request
+          end
           response = http.start do |http|
             http.request(req)
           end
@@ -70,16 +76,14 @@ module FotoVerite
             retries -= 1
             retry
           else
-            RAILS_DEFAULT_LOGGER.warn "The connection to the remote server timed out"
-            return "We appoligize for the inconvience but our USPS service is busy at the moment. To retry please refresh the browser"
+            raise ConnectionError.new("timeout error")
           end
         rescue SocketError
-          RAILS_DEFAULT_LOGGER.error "There is a socket error with USPS plugin"
-          return "We appoligize for the inconvience but there is a problem with our server. To retry please refresh the browser"
+          raise ConnectionError.new("socket error")
         end
         case response
         when Net::HTTPSuccess, Net::HTTPRedirection
-          case  PARSE_METHOD[action]
+          case PARSE_METHOD[action]
           when 'parse_address_information'
             parse_address_information(response.body)
           when 'parse_confirmation_label'
@@ -90,8 +94,8 @@ module FotoVerite
             parse_express_mail_label(response.body, image_type)
           when  'parse_internation_label'
             parse_internation_label(response.body, image_type, RESPONSE[action])
-          when 'parse_open_distrubute_priority'
-            parse_open_distrubute_priority(response.body, image_type)
+          when 'parse_open_distribute_priority'
+            parse_open_distribute_priority(response.body, image_type)
           when 'parse_express'
             parse_express(response.body)
           when 'parse_service'
@@ -104,8 +108,7 @@ module FotoVerite
             parse_tracking(response.body)
           end
         else
-          RAILS_DEFAULT_LOGGER.warn("USPS plugin settings are wrong #{response}")
-          return "USPS plugin settings are wrong #{response}"
+          raise ConnectionError.new(response)
         end
       end
 
