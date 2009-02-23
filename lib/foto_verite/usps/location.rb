@@ -47,6 +47,10 @@ module FotoVerite #:nodoc:
         attributes.each {|k, v| send("#{k}=", v) }
       end
       
+      # used by address verification
+      attr_writer :incomplete
+      def incomplete?; @incomplete; end
+      
       def full_name
         compact(first_name, last_name).join(" ")
       end

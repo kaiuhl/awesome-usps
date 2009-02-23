@@ -87,8 +87,10 @@ module FotoVerite
       #--
       # TODO: This needs to have access to the original location list
       def parse_address_information(xml)
-        #puts "--- Response ---"
-        #puts xml
+        if @options[:debug]
+          puts "--- Response ---"
+          puts xml
+        end
         i = 0
         addresses = []
         doc = Hpricot.parse(xml)
@@ -105,16 +107,16 @@ module FotoVerite
           if error =  address.at("error")
             raise Error, "Error during address verification for address ##{i}: '#{error.at("description").inner_text}'"
           end
-          if address.at("returntext")
-            # we need an apartment, suite, or box number to really find the address
-            raise GeneralAddressFoundError
-          else
-            addresses << address.children.inject(Location.new) {|loc, elem|
-              next if elem.name == 'returntext'
-              loc.send("#{elem.name}=", elem.inner_text) unless elem.inner_text.blank?
-              loc
-            }
+          loc = Location.new
+          address.children.each do |elem|
+            next if elem.name == 'returntext'
+            loc.send("#{elem.name}=", elem.inner_text) unless elem.inner_text.blank?
           end
+          if t = address.at("returntext") and t.inner_text =~ /more information is needed/
+            # we need an apartment, suite, or box number to really find the address
+            loc.incomplete = true
+          end
+          addresses << loc
         end
         return addresses
       end
