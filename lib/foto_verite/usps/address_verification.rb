@@ -96,7 +96,8 @@ module FotoVerite
         doc = Hpricot.parse(xml)
         if error = doc.at("error")
           msg = error.at("description").inner_text
-          if msg =~ /address not found/i
+          if msg =~ /address not found|invalid/i
+          #if msg =~ /address not found/
             raise AddressNotFoundError
           else
             raise Error, "Error during address verification: '#{msg}'"
