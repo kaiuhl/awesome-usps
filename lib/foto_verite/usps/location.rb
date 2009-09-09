@@ -16,7 +16,7 @@ module FotoVerite #:nodoc:
         
         def define_attribute_accessor(name)
           define_method(name) { @attributes[name] }
-          define_method("#{name}=") {|value| @attributes[name] = value.upcase }
+          define_method("#{name}=") {|value| @attributes[name] = value.to_s.upcase }
         end
       
         def define_attribute_aliases(map)
