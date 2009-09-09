@@ -2,6 +2,37 @@ module FotoVerite #:nodoc:
   class USPS
     class Location
       
+      class << self
+        def from(location_or_hash)
+          location_or_hash.is_a?(Location) ? location_or_hash : Location.new(location_or_hash)
+        end
+      
+      private
+        def define_attribute_accessors(attribute_names)
+          attribute_names.each do |name|
+            define_attribute_accessor(name)
+          end
+        end
+        
+        def define_attribute_accessor(name)
+          define_method(name) { @attributes[name] }
+          define_method("#{name}=") {|value| @attributes[name] = value.upcase }
+        end
+      
+        def define_attribute_aliases(map)
+          map.each do |method, method_aliases|
+            Array(method_aliases).each do |method_alias|
+              alias_accessor method_alias, method
+            end
+          end
+        end
+      
+        def alias_accessor(method_alias, method)
+          alias_method method_alias, method
+          alias_method :"#{method_alias}=", :"#{method}="
+        end
+      end
+      
       @@valid_attributes = %w(
         first_name
         last_name
@@ -19,28 +50,12 @@ module FotoVerite #:nodoc:
         from_urbanization
       )
       
-      @@valid_attributes.each do |attr|
-        define_method(attr) { @attributes[attr] }
-        define_method("#{attr}=") {|value| @attributes[attr] = value }
-      end
+      define_attribute_accessors @@valid_attributes
       
-      # address 1 and address 2 are actually switched in the USPS API... dumb or what?!
-      %w(address).each do |m|
-        alias_method :"#{m}", :address2
-        alias_method :"#{m}=", :address2=
-      end
-      %w(postal_code postcode postalcode postal zip).each do |m|
-        alias_method :"#{m}", :zip5
-        alias_method :"#{m}=", :zip5=
-      end
-      %w(province territory region).each do |m|
-        alias_method :"#{m}", :state
-        alias_method :"#{m}=", :state=
-      end
-      
-      def self.from(location_or_hash)
-        location_or_hash.is_a?(Location) ? location_or_hash : Location.new(location_or_hash)
-      end
+      define_attribute_aliases :address1 => :address,
+                               :zip5 => %w(postal_code postcode postalcode postal zip),
+                               :state => %w(province territory region),
+                               :firm_name => :firmname
 
       def initialize(attributes = {})
         @attributes = {}
@@ -56,17 +71,16 @@ module FotoVerite #:nodoc:
       end
       
       def full_address
-        compact(address2, address1, address3).join("\n")
+        compact(address1, address2, address3).join("\n")
       end
       
       def full_zip
-        zip5 + (zip4.blank? ? "" : "-#{zip4}")
+        zip5.to_s + (zip4.blank? ? "" : "-#{zip4}")
       end
 
       def inspect
-        "#<#{self.class}:#{self.hash} " +
-        @@valid_attributes.inject([]) {|a,k| v = @attributes[k]; a << "@#{k}=#{v.inspect}" unless v.blank?; a }.join(" ") +
-        ">"
+        attributes = @@valid_attributes.inject([]) {|a,k| v = @attributes[k]; a << "@#{k}=#{v.inspect}" unless v.blank?; a }.join(" ")
+        '#<%s:0x%x %s>' % [self.class, self.object_id * 2, attributes]
       end
 
       def to_s
@@ -83,7 +97,7 @@ module FotoVerite #:nodoc:
       end
       
       def city_state_zip
-        city_state + " " + full_zip
+        city_state.to_s + " " + full_zip.to_s
       end
     
       def compact(*strings)

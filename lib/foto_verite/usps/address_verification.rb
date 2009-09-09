@@ -67,9 +67,11 @@ module FotoVerite
             l=locations[id]
             xm.Address("ID" => "#{id}") do
               xm.FirmName(l.firm_name)
-              xm.Address1(l.address1)
-              xm.Address2(l.address2)
-              if api_request !="CityStateLookupRequest"
+              # address 1 and address 2 are actually switched in the USPS API for some reason
+              # so we need to switch them before sending
+              xm.Address1(l.address2)
+              xm.Address2(l.address1)
+              if api_request != "CityStateLookupRequest"
                 xm.City(l.city)
                 xm.State(l.state)
               end
@@ -94,26 +96,42 @@ module FotoVerite
         i = 0
         addresses = []
         doc = Hpricot.parse(xml)
+        incomplete_address = nil
         if error = doc.at("error")
           msg = error.at("description").inner_text
-          if msg =~ /address not found|invalid/i
-          #if msg =~ /address not found/
+          if msg =~ /multiple addresses were found/i
+            # we need an apartment, suite, or box number to really find the address
+            incomplete_address = true
+          elsif msg =~ /address not found|invalid/i
             raise AddressNotFoundError
           else
             raise Error, "Error during address verification: '#{msg}'"
           end
         end
         doc.search("address").each_with_index do |address, i|
-          # Check if there was an error in an address element
-          if error =  address.at("error")
-            raise Error, "Error during address verification for address ##{i}: '#{error.at("description").inner_text}'"
-          end
           loc = Location.new
-          address.children.each do |elem|
-            next if elem.name == 'returntext'
-            loc.send("#{elem.name}=", elem.inner_text) unless elem.inner_text.blank?
+          # Check if there was an error in an address element
+          if error = address.at("error")
+            msg = error.at("description").inner_text
+            if incomplete_address || msg =~ /multiple addresses were found/i
+              loc.incomplete = true
+            else
+              raise Error, "Error during address verification for address ##{i}: '#{msg}'"
+            end
           end
-          if t = address.at("returntext") and t.inner_text =~ /more information is needed/
+          address.children.each do |elem| 
+            name = elem.name
+            next if name == 'returntext' || name == 'error'
+            # address 1 and address 2 are actually switched in the USPS API for some reason
+            # so we need to unswitch them before storing
+            if name == "address1"
+              name = "address2"
+            elsif name == "address2"
+              name = "address1"
+            end
+            loc.send("#{name}=", elem.inner_text) unless elem.inner_text.blank?
+          end
+          if incomplete_address || (t = address.at("returntext") and t.inner_text =~ /(more information is needed|multiple addresses were found)/i)
             # we need an apartment, suite, or box number to really find the address
             loc.incomplete = true
           end
