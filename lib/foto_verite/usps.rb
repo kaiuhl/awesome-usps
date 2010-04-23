@@ -17,7 +17,7 @@ module FotoVerite
       end
     end
     
-    def initialize(username, options)
+    def initialize(username, options={})
       @username = validate(username)
       @options = options
     end
