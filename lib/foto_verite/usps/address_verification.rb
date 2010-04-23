@@ -90,15 +90,15 @@ module FotoVerite
       # TODO: This needs to have access to the original location list
       def parse_address_information(xml)
         if @options[:debug]
-          puts "--- Response ---"
-          puts xml
+          RAILS_DEFAULT_LOGGER.debug "--- Response ---"
+          RAILS_DEFAULT_LOGGER.debug xml
         end
         i = 0
         addresses = []
-        doc = Hpricot.parse(xml)
+        doc = Nokogiri::XML(xml)
         incomplete_address = nil
-        if error = doc.at("error")
-          msg = error.at("description").inner_text
+        if error = doc.at_css("Error")
+          msg = error.at_css("Description").inner_text
           if msg =~ /multiple addresses were found/i
             # we need an apartment, suite, or box number to really find the address
             incomplete_address = true
@@ -108,11 +108,11 @@ module FotoVerite
             raise Error, "Error during address verification: '#{msg}'"
           end
         end
-        doc.search("address").each_with_index do |address, i|
+        doc.css("Address").each_with_index do |address, i|
           loc = Location.new
           # Check if there was an error in an address element
-          if error = address.at("error")
-            msg = error.at("description").inner_text
+          if error = address.at_css("Error")
+            msg = error.at_css("Description").inner_text
             if incomplete_address || msg =~ /multiple addresses were found/i
               loc.incomplete = true
             else
@@ -121,17 +121,17 @@ module FotoVerite
           end
           address.children.each do |elem| 
             name = elem.name
-            next if name == 'returntext' || name == 'error'
+            next if name == 'ReturnText' || name == 'Error'
             # address 1 and address 2 are actually switched in the USPS API for some reason
             # so we need to unswitch them before storing
-            if name == "address1"
-              name = "address2"
-            elsif name == "address2"
-              name = "address1"
+            if name == "Address1"
+              name = "Address2"
+            elsif name == "Address2"
+              name = "Address1"
             end
-            loc.send("#{name}=", elem.inner_text) unless elem.inner_text.blank?
+            loc.send("#{name.downcase}=", elem.inner_text) unless elem.inner_text.blank?
           end
-          if incomplete_address || (t = address.at("returntext") and t.inner_text =~ /(more information is needed|multiple addresses were found)/i)
+          if incomplete_address || (t = address.at_css("ReturnText") and t.inner_text =~ /(more information is needed|multiple addresses were found)/i)
             # we need an apartment, suite, or box number to really find the address
             loc.incomplete = true
           end
