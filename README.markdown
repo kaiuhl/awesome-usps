@@ -99,11 +99,11 @@ Object Methods are as follow
     # Package up a poster and a Wii for your nephew.
 	# Note the Package Module has been taken directly from Active Shipping. Thank you James MacAulay for developing such great code. 
     packages = [
-      Package.new(  100,                        # 100 grams
+      USPS::Package.new(  100,                        # 100 grams
                     [93,10],                    # 93 cm long, 10 cm diameter
                     :cylinder => true),         # cylinders have different volume calculations
     
-      Package.new(  (7.5 * 16),                 # 7.5 lbs, times 16 oz/lb.
+      USPS::Package.new(  (7.5 * 16),                 # 7.5 lbs, times 16 oz/lb.
                     [15, 10, 4.5],              # 15x10x4.5 inches
                     :units => :imperial)        # not grams, not centimetres
     ]
