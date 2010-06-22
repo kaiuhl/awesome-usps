@@ -17,8 +17,8 @@ module  FotoVerite
 
 
       def canned_delivery_confirmation_label_test
-        origin = Location.new( :name=> "John Smith",  :address2 => "6406 Ivy Lane",  :state => 'MD', :city => 'Greenbelt', :zip5 => '20770')
-        destination =Location.new( :name=> "Joe Customer",  :address2 =>"136 Linwood Plz",  :state => 'NJ', :city => 'Fort Lee', :zip5 => "07024")
+        origin = Location.new(:first_name=> 'John', :last_name => "Smith",  :address2 => "6406 Ivy Lane",  :state => 'MD', :city => 'Greenbelt', :zip5 => '20770')
+        destination =Location.new(:first_name => "John", :last_name => "Customer",  :address2 =>"136 Linwood Plz",  :state => 'NJ', :city => 'Fort Lee', :zip5 => "07024")
         service_type = "Priority"
         image_type ="PDF"
         label_type = 1
@@ -46,7 +46,7 @@ module  FotoVerite
         xm.tag!(api_request, "USERID"=>"#{@username}") do
           xm.Option(label_type)
           xm.ImageParameters #Will be used in the future. Is a required tag.
-          xm.FromName(origin.name)
+          xm.FromName(origin.full_name)
           xm.FromFirm(origin.firm_name)
           xm.FromAddress1(origin.address1) #Used for an apartment or suite number. Yes the API is a bit fucked.
           xm.FromAddress2(origin.address2)
@@ -54,7 +54,7 @@ module  FotoVerite
           xm.FromState(origin.state)
           xm.FromZip5(origin.zip5)
           xm.FromZip4(origin.zip4)
-          xm.ToName(destination.name)
+          xm.ToName(destination.full_name)
           xm.ToFirm(destination.firm_name)
           xm.ToAddress1(destination.address1)
           xm.ToAddress2(destination.address2)
