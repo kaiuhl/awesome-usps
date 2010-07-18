@@ -5,14 +5,14 @@ module  FotoVerite
       def delivery_confirmation_label(origin, destination, service_type, image_type, label_type=1, api_request = "DeliveryConfirmationV3.0Request", options={})
         request = confirmation_xml(api_request, origin, destination, service_type, image_type, label_type, options)
         #YES THE API IS THAT STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
-        commit_confirmation_xml(:delivery, 'DeliveryConfirmationV3', request,:ssl, image_type)
+        gateway_commit(:delivery_confirmation_certify, 'DeliveryConfirmationV3', request,:ssl, image_type)
       end
 
       def signature_confirmation_label(origin, destination, service_type, image_type, label_type=1,
         api_request = "SignatureConfirmationV3.0Request", options={})
         request = confirmation_xml(api_request, origin, destination, service_type, image_type, label_type, options)
         #YES THE API IS THAT STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
-        commit_confirmation_xml(:signature, 'SignatureConfirmationV3', request, :ssl, image_type)
+        gateway_commit(:signature_confirmation_certify, 'SignatureConfirmationV3', request, :ssl, image_type)
       end
 
 
