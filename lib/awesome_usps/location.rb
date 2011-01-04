@@ -1,4 +1,4 @@
-module FotoVerite #:nodoc:
+module AwesomeUsps #:nodoc:
   class Location
 
     attr_reader :options,

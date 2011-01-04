@@ -1,3 +1,5 @@
+$:.unshift File.expand_path("../lib", __FILE__)
+
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
@@ -5,14 +7,14 @@ require 'rake/rdoctask'
 desc 'Default: run unit tests.'
 task :default => :test
 
-desc 'Test the usps plugin.'
+desc 'Test the awesome-usps plugin.'
 Rake::TestTask.new(:test) do |t|
   t.libs << 'lib'
   t.pattern = 'test/**/*_test.rb'
   t.verbose = true
 end
 
-desc 'Generate documentation for the usps plugin.'
+desc 'Generate documentation for the awesome-usps plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title    = 'Usps'
