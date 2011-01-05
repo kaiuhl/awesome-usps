@@ -1,25 +1,18 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
 
-class AddressVerificationTest < Test::Unit::TestCase
+class LiveAddressVerificationTest < Test::Unit::TestCase
   include AwesomeUsps
   
   def setup
-    @api = AwesomeUsps::Api.new(:username => USERNAME, :server => :test)
+    @api = AwesomeUsps::Api.new(:username => USERNAME, :server => :production)
   end
   
   
   
-  # Run Scripted Test | Address-Information-v3-1.pdf, page 8
-  def test_canned_verify_address_test_1
-    canned_address = Location.new(:address2 => "6406 Ivy Lane", :city => "Greenbelt", :state => "MD")
-    expected_result = [{:zip4 => "1440", :state => "MD", :verified => true, :address2 => "6406 IVY LN", :zip5 => "20770", :city => "GREENBELT"}]
-    assert_equal expected_result, @api.verify_address(canned_address)
-  end
-  
-  def test_canned_verify_address_test_2
-    canned_address = Location.new(:address2 => "8 Wildwood Drive", :city => "Old Lyme", :state => "CT", :zip5 => "06371")
-    expected_result = [{:zip4 => "1844", :state => "CT", :verified => true, :address2 => "8 WILDWOOD DR", :zip5 => "06371", :city => "OLD LYME"}]
-    assert_equal expected_result, @api.verify_address(canned_address)
+  def test_uncanned_verify_address_call_on_test_api
+    sloppy_address = [{:street => '3558 Jeffreson Av', :city => 'StL', :state => 'Missouri', :zip5 => '63118'}]
+    expected_result = [{:address2 => '3558 S JEFFERSON AVE', :city => 'ST LOUIS', :state => 'MO', :zip5 => '63118', :verified => true}]
+    assert_equal expected_result, @api.verify_address(sloppy_address)
   end
   
   

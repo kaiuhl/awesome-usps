@@ -1,4 +1,3 @@
-require 'awesome_usps/location'
 require 'builder'
 
 
@@ -40,16 +39,17 @@ module AwesomeUsps
     def write_xml_of_locations(api, locations)
       xml = ""
       # xm = Builder::XmlMarkup.new(xml)
-      locations.each_with_index do |l, i|
+      locations.each_with_index do |location, i|
+        h = normalize_location_hash(location)
         xml << <<-XML
         <Address ID="#{i}">
-          <FirmName>#{l.firm_name}</FirmName>
-          <Address1>#{l.address1}</Address1>
-          <Address2>#{l.address2}</Address2>
-          <City>#{l.city}</City>
-          <State>#{l.state}</State>
-          <Zip5>#{l.zip5}</Zip5>
-          <Zip4>#{l.zip4}</Zip4>
+          <FirmName>#{h[:firm_name]}</FirmName>
+          <Address1>#{h[:address1]}</Address1>
+          <Address2>#{h[:address2]}</Address2>
+          <City>#{h[:city]}</City>
+          <State>#{h[:state]}</State>
+          <Zip5>#{h[:zip5]}</Zip5>
+          <Zip4>#{h[:zip4]}</Zip4>
         </Address>
         XML
         # xm.Address("ID" => i.to_s) do
@@ -71,9 +71,25 @@ module AwesomeUsps
     
     
     
+    def normalize_location_hash(hash)
+      zip = hash[:zip] || hash[:zip_code] || hash[:postal] || hash[:postal_code] || ""
+      {
+        :firm_name => hash[:firm_name] || hash[:name] || hash[:first_name] || hash[:company],
+        :address1 => hash[:address1],
+        :address2 => hash[:address2] || hash[:street],
+        :city => hash[:city],
+        :state => hash[:state] || hash[:province] || hash[:territory] || hash[:region],
+        :zip5 => hash[:zip5] || (zip.match(/(\d{5})(?:-\d{4})?/)||[])[1],
+        :zip4 => hash[:zip4] || (zip.match(/\d{5}-(\d{4})/)||[])[1]
+      }
+    end
+    
+    
+    
     # Parses the XML into an array broken up by each address.
     # For verify_address :verified will be false if multiple address were found.
     def parse_address_verification_response(xml)
+      p xml
       i = 0
       list_of_verified_addresses = []
       (Hpricot.parse(xml)/:address).each do |address|
@@ -81,8 +97,6 @@ module AwesomeUsps
         h = {}
         # Check if there was an error in an address element
         if address.search("error") != []
-          RAILS_DEFAULT_LOGGER.info("Address number #{i} has the error '#{address.search("description").inner_html}' please fix before continuing")
-          
           return "Address number #{i} has the error '#{address.search("description").inner_html}' please fix before continuing"
         end
         if address.search("ReturnText") != []
