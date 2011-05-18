@@ -1,3 +1,3 @@
 module AwesomeUsps
-  VERSION = "0.1.0" unless defined?(::AwesomeUsps::Version)
+  VERSION = "0.1.1" unless defined?(::AwesomeUsps::Version)
 end
