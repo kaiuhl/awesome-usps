@@ -43,7 +43,7 @@ module AwesomeUsps
     def confirmation_xml(api_request, origin, destination, service_type, image_type, label_type, options)
       xm = Builder::XmlMarkup.new
       xm.tag!(api_request, "USERID"=>"#{@username}") do
-        xm.Option(label_type)
+		xm.Option(label_type)
         xm.ImageParameters #Will be used in the future. Is a required tag.
         xm.FromName(origin.name)
         xm.FromFirm(origin.firm_name)
@@ -61,18 +61,18 @@ module AwesomeUsps
         xm.ToState(destination.state)
         xm.ToZip5(destination.zip5)
         xm.ToZip4(destination.zip4)
-        xm.WeightInOunces('weight_in_ounces', options[:weight_in_ounces])
+        xm.WeightInOunces(options[:weight_in_ounces].to_s)
         xm.ServiceType(service_type)
-        xm.SeparateReceiptPage(options[:seperate])
-        xm.POZipCode(options[:po_zip_code])
+        xm.SeparateReceiptPage(options[:seperate].to_s)
+        xm.POZipCode(options[:po_zip_code].to_s)
         xm.ImageType(image_type)
-        xm.LabelDate(options[:label_date])
-        xm.CustomerRefNo(options[:customer_reference_number])
-        xm.AddressServiceRequested(options[:address_service])
-        xm.SenderName(options[:sender_name])
-        xm.SenderEMail(options[:sender_email])
-        xm.RecipientName(options[:recipient_name])
-        xm.RecipientEMail(options[:recipient_email])
+        xm.LabelDate(options[:label_date].to_s)
+        xm.CustomerRefNo(options[:customer_reference_number].to_s)
+        xm.AddressServiceRequested(options[:address_service].to_s)
+        xm.SenderName(options[:sender_name].to_s)
+        xm.SenderEMail(options[:sender_email].to_s)
+        xm.RecipientName(options[:recipient_name].to_s)
+        xm.RecipientEMail(options[:recipient_email].to_s)
       end
     end
 
