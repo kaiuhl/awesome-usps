@@ -57,10 +57,10 @@ module AwesomeUsps
         http = Net::HTTP.new(url.host, url.port)
         http.open_timeout = 2
         http.read_timeout = 2
-        if @platform == :ssl
-          http.use_ssl = true
+        #if @use_ssl
+		  http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        end
+        #end
         response = http.start do |http|
           http.request(req)
         end
@@ -111,9 +111,9 @@ module AwesomeUsps
     def url_path(action)
       case action
       when :test
-        return  "http://#{TEST_DOMAIN}#{TEST_RESOURCE}"
+        return  "https://#{TEST_DOMAIN}#{TEST_RESOURCE}"
       when :live
-        return "http://#{LIVE_DOMAIN}#{LIVE_RESOURCE}"
+        return "https://#{LIVE_DOMAIN}#{LIVE_RESOURCE}"
       when :ssl
         return "https://#{SSL_DOMAIN}#{SSL_RESOURCE}"
       end
