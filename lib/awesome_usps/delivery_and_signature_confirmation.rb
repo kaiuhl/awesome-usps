@@ -61,7 +61,7 @@ module AwesomeUsps
         xm.ToState(destination.state)
         xm.ToZip5(destination.zip5)
         xm.ToZip4(destination.zip4)
-        xm.WeightInOunces(options[:weight_in_ounces])
+        #xm.WeightInOunces(options[:weight_in_ounces])
         xm.ServiceType(service_type)
         xm.SeparateReceiptPage(options[:seperate])
         xm.POZipCode(options[:po_zip_code])
