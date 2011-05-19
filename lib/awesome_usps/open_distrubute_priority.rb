@@ -4,7 +4,7 @@ module AwesomeUsps
     def open_distrubute_priority_label(origin, destination, package_weight_in_ounces,  mail_type, image_type, label_type=1, api_requst = "OpenDistributePriorityRequest", options={})
       request = open_distrubute_priority_xml(api_requst, origin, destination, package_weight_in_ounces,  mail_type, image_type, label_type, options)
       #YES THE API IS THAT STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
-      gateway_commit(:open_distrubute_priority, 'OpenDistributePriority', request, :ssl, image_type)
+      gateway_commit(:open_distrubute_priority, 'OpenDistributePriority', request, image_type)
     end
 
     def canned_open_distrubute_priority_label_test
@@ -17,7 +17,7 @@ module AwesomeUsps
       api_requst = "OpenDistributePriorityCertifyRequest"
       label_type=1
       request= open_distrubute_priority_xml(api_requst, origin, destination, package_weight_in_ounces,  mail_type, image_type, label_type, options)
-      gateway_commit(:open_distribute_priority_certify, 'OpenDistributePriorityCertify', request, :ssl, image_type)
+      gateway_commit(:open_distribute_priority_certify, 'OpenDistributePriorityCertify', request, image_type)
     end
 
     private

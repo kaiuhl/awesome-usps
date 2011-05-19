@@ -4,13 +4,13 @@ module AwesomeUsps
     # Takes your package tracking number and returns information for the USPS web API
     def track(tracking_number)
       request = xml_for_tracking(tracking_number)
-      gateway_commit(:tracking, 'TrackV2', request, :live)
+      gateway_commit(:tracking, 'TrackV2', request)
     end
 
     def canned_tracking
       tracking_number = "EJ958083578US"
       request = xml_for_tracking(tracking_number)
-      gateway_commit(:tracking, 'TrackV2', request, :test)
+      gateway_commit(:tracking, 'TrackV2', request)
     end
 
     # XML from a straight string.

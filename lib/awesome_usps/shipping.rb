@@ -53,14 +53,14 @@ module AwesomeUsps
     def domestic_rates(origin_zip, destination_zip, packages, options={})
       Array(packages)  if not packages.is_a? Array
       request = xml_for_us(origin_zip, destination_zip, packages, options)
-      gateway_commit(:us_rates, 'RateV3', request, :live)
+      gateway_commit(:us_rates, 'RateV3', request)
     end
 
     # options Are?
     def world_rates(country, packages, api_request='IntlRate', options={})
       Array(packages)  if not packages.is_a? Array
       request = xml_for_world(country, packages, options)
-      gateway_commit(:world_rates, 'IntlRate', request, :live)
+      gateway_commit(:world_rates, 'IntlRate', request)
     end
 
     def canned_domestic_rates_test
@@ -77,7 +77,7 @@ module AwesomeUsps
       destination_zip = "10010"
       options = {}
       request = xml_for_us(origin_zip, destination_zip, packages, options)
-      gateway_commit(:us_rates, 'RateV3', request, :live)
+      gateway_commit(:us_rates, 'RateV3', request)
     end
 
 
@@ -95,7 +95,7 @@ module AwesomeUsps
       country = "Japan"
       options ={}
       request = xml_for_world(country, packages, options)
-      gateway_commit(:world_rates,'IntlRate', request, :live)
+      gateway_commit(:world_rates,'IntlRate', request)
     end
 
     private

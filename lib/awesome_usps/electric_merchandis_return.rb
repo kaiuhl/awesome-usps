@@ -4,7 +4,7 @@ module AwesomeUsps
     def merch_return(service_type, customer, retailer, permit_number, post_office, postage_delivery_unit,  ounces, image_type, api_request = "EMRSV3.0Request", options={})
       request = merch_return_xml(api_request, service_type, customer, retailer, permit_number, post_office, postage_delivery_unit,  ounces, image_type, options)
       #YES THE API IS SO STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
-      gateway_commit(:merchandise_return, "MerchandiseReturnV3", request, :ssl, image_type)
+      gateway_commit(:merchandise_return, "MerchandiseReturnV3", request, image_type)
     end
 
     def canned_merch_return_test
@@ -19,7 +19,7 @@ module AwesomeUsps
       image_type ="PDF"
       api_request = "EMRSV3.0CertifyRequest"
       request = merch_return_xml(api_request, service_type, customer, retailer, permit_number, post_office, postage_delivery_unit,  ounces, image_type, options)
-      gateway_commit(:merchandise_return_certify, 'MerchReturnCertifyV3', request, :ssl, image_type)
+      gateway_commit(:merchandise_return_certify, 'MerchReturnCertifyV3', request, image_type)
     end
 
     private

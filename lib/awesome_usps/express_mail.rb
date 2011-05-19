@@ -4,7 +4,7 @@ module AwesomeUsps
     def express_mail_label(orgin, destination, ounces, image_type, request_api = "ExpressMailLabelRequest", options={})
       request = express_mail_xml(request_api, orgin, destination, ounces, image_type, options)
       #YES THE API IS SO STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
-      gateway_commit(:express_mail_label, 'ExpressMailLabel', request, :ssl, image_type)
+      gateway_commit(:express_mail_label, 'ExpressMailLabel', request, image_type)
     end
 
     def canned_express_mail_label_test
@@ -15,7 +15,7 @@ module AwesomeUsps
       options = {}
       request_api = "ExpressMailLabelCertifyRequest"
       request = express_mail_xml(request_api, orgin, destination, ounces, image_type, options)
-      gateway_commit(:express_mail_label_certify, 'ExpressMailLabelCertify', request, :ssl, image_type)
+      gateway_commit(:express_mail_label_certify, 'ExpressMailLabelCertify', request, image_type)
     end
 
     private
