@@ -6,19 +6,19 @@ module AwesomeUsps
       origin = orgin
       destination=destination
       request = xml_for_estimated_time_for_delivery(api_request, origin, destination)
-      commit_service_standard_request(:priority_mail, 'PriorityMail', request , :live)
+      commit_service_standard_request(:priority_mail, 'PriorityMail', request)
     end
 
     def standard_mail_estimated_time(origin, destination, api_request='StandardBRequest')
       origin = orgin
       destination=destination
       request = xml_for_estimated_time_for_delivery(api_request, origin, destination)
-      gateway_commit(:standard, 'StandardB', request, :live)
+      gateway_commit(:standard, 'StandardB', request)
     end
 
     def express_mail_commitment(origin, destination, date=nil, api_request='ExpressMailCommitmentRequest')
       xml_for_estimated_time_for_delivery(api_request, origin, destination, date)
-      gateway_commit(:express, 'ExpressMailCommitment', request, :live)
+      gateway_commit(:express, 'ExpressMailCommitment', request)
     end
 
     def canned_standard_mail_estimated_time_test
@@ -26,7 +26,7 @@ module AwesomeUsps
       destination = Location.new( :zip5 => '4')
       api_request="StandardBRequest"
       request = xml_for_estimated_time_for_delivery(api_request, origin, destination)
-      gateway_commit(:priority_mail, 'PriorityMail', request,  :test)
+      gateway_commit(:priority_mail, 'PriorityMail', request)
     end
 
     def canned_priority_mail_estimated_time_test
@@ -34,7 +34,7 @@ module AwesomeUsps
       destination = Location.new( :zip5 => '4')
       api_request="PriorityMailRequest"
       request = xml_for_estimated_time_for_delivery(api_request, origin, destination)
-      gateway_commit(:standard, 'StandardB',  request,  :test)
+      gateway_commit(:standard, 'StandardB',  request)
     end
 
     def canned_express_mail_commitment_test
@@ -43,7 +43,7 @@ module AwesomeUsps
       date = '05-Aug-2004'
       api_request = 'ExpressMailCommitmentRequest'
       request = xml_for_estimated_time_for_delivery(api_request, origin, destination, date)
-      gateway_commit(:express, 'ExpressMailCommitment', request,  :test)
+      gateway_commit(:express, 'ExpressMailCommitment', request)
     end
 
     # XML from a straight string.

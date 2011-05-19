@@ -12,7 +12,7 @@ module AwesomeUsps
       request = international_mail_labels_xml(request_api, sender, receiver, items, content_type, image_type, po_box_flag,
       image_layout, label_type, options)
       #YES THE API IS THAT STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
-      gateway_commit(:express_mail, 'ExpressMailIntl', request, :ssl, image_type)
+      gateway_commit(:express_mail, 'ExpressMailIntl', request, image_type)
     end
 
     def canned_express_mail_international_label_test
@@ -27,7 +27,7 @@ module AwesomeUsps
       label_type="1"
       options ={}
       request= international_mail_labels_xml(request_api, sender, receiver, items, content_type, image_type, po_box_flag, image_layout, label_type, options)
-      gateway_commit(:express_mail_certify, 'ExpressMailIntlCertify', request, :ssl, image_type)
+      gateway_commit(:express_mail_certify, 'ExpressMailIntlCertify', request, image_type)
     end
     
     def priority_mail_international_label(sender, receiver, items, content_type, image_type, po_box_flag ="N",
@@ -36,7 +36,7 @@ module AwesomeUsps
       request = international_mail_labels_xml(request_api, sender, receiver, items, content_type, image_type, po_box_flag,
       image_layout, label_type, options)
       #YES THE API IS THAT STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
-      gateway_commit(:priority_mail, 'PriorityMailIntl', request, :ssl, image_type)
+      gateway_commit(:priority_mail, 'PriorityMailIntl', request, image_type)
     end
 
     def canned_priority_mail_international_label_test
@@ -52,7 +52,7 @@ module AwesomeUsps
       options ={}
       request= international_mail_labels_xml(request_api, sender, receiver, items, content_type, image_type, po_box_flag,
       image_layout, label_type, options)
-      gateway_commit(:priority_mail_certify, 'PriorityMailIntlCertify', request, :ssl, image_type)
+      gateway_commit(:priority_mail_certify, 'PriorityMailIntlCertify', request, image_type)
     end
 
     def first_class_international_label(sender, receiver, items, content_type, image_type, po_box_flag ="N",
@@ -61,7 +61,7 @@ module AwesomeUsps
       request = first_class_international_mail_labels_xml(request_api, sender, receiver, items, content_type, image_type, po_box_flag,
       image_layout, label_type, options)
       #YES THE API IS THAT STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
-      gateway_commit(:first_class_mail, 'FirstClassMailIntl', request, :ssl, image_type)
+      gateway_commit(:first_class_mail, 'FirstClassMailIntl', request, image_type)
     end
 
     def canned_first_class_mail_international_label_test
@@ -78,7 +78,7 @@ module AwesomeUsps
       options ={}
       request= first_class_international_mail_labels_xml(request_api, sender, receiver, items, content_type, image_type, po_box_flag,
       image_layout, label_type, options)
-      gateway_commit(:first_class_mail_certify, 'FirstClassMailIntlCertify', request, :ssl, image_type)
+      gateway_commit(:first_class_mail_certify, 'FirstClassMailIntlCertify', request, image_type)
     end
 
     private

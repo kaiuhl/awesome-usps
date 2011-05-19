@@ -19,21 +19,21 @@ module AwesomeUsps
       locations = Array(locations) if not locations.is_a? Array
       api_request = "AddressValidateRequest"
       request = xml_for_verify_address(api_request, locations)
-      gateway_commit(:verify_address, 'Verify', request, :live)
+      gateway_commit(:verify_address, 'Verify', request)
     end
 
     def zip_lookup(locations)
       locations = Array(locations) if not locations.is_a? Array
       api_request = "ZipCodeLookupRequest"
       request = xml_for_address_information_api(api_request, locations)
-      gateway_commit(:zip_lookup, 'ZipCodeLookup',request, :live)
+      gateway_commit(:zip_lookup, 'ZipCodeLookup',request)
     end
 
     def city_state_lookup(locations)
       locations = Array(locations) if not locations.is_a? Array
       api_request = "CityStateLookupRequest"
       request = xml_for_address_information_api(api_request, locations)
-      gateway_commit(:zip_lookup, 'CityStateLookup', request, :live)
+      gateway_commit(:zip_lookup, 'CityStateLookup', request)
     end
 
 
@@ -41,21 +41,21 @@ module AwesomeUsps
       locations = [Location.new(:address2 => "6406 Ivy Lane", :city =>"Greenbelt", :state => "MD"), Location.new(:address2=>"8 Wildwood Drive", :city => "Old Lyme",:state => "CT", :zip5 => "06371"   )]
       api_request = "AddressValidateRequest"
       request = xml_for_address_information_api(api_request, locations)
-      gateway_commit(:verify_address, 'Verify', request, :test)
+      gateway_commit(:verify_address, 'Verify', request)
     end
 
     def canned_zip_lookup_test
       locations = [Location.new(:address2 => "6406 Ivy Lane", :city =>"Greenbelt", :state => "MD"), Location.new(:address2=>"8 Wildwood Drive", :city => "Old Lyme",:state => "CT", :zip5 => "06371"   )]
       api_request = "ZipCodeLookupRequest"
       request = xml_for_address_information_api(api_request, locations)
-      gateway_commit(:zip_lookup, 'ZipCodeLookup', request, :test)
+      gateway_commit(:zip_lookup, 'ZipCodeLookup', request)
     end
 
     def canned_city_state_lookup_test
       locations = [Location.new(:address2 => "6406 Ivy Lane", :city =>"Greenbelt", :state => "MD"), Location.new(:address2=>"8 Wildwood Drive", :city => "Old Lyme",:state => "CT", :zip5 => "06371")]
       api_request = "CityStateLookupRequest"
       request = xml_for_address_information_api(api_request, locations)
-      gateway_commit(:zip_lookup, 'CityStateLookup', request, :test)
+      gateway_commit(:zip_lookup, 'CityStateLookup', request)
     end
 
     # XML from  Builder::XmlMarkup.new

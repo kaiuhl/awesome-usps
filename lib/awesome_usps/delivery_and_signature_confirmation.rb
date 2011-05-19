@@ -4,14 +4,14 @@ module AwesomeUsps
     def delivery_confirmation_label(origin, destination, service_type, image_type, label_type=1, api_request = "DeliveryConfirmationV3.0Request", options)
       request = confirmation_xml(api_request, origin, destination, service_type, image_type, label_type, options)
       #YES THE API IS THAT STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
-      gateway_commit(:delivery, 'DeliveryConfirmationV3', request,:ssl, image_type)
+      gateway_commit(:delivery, 'DeliveryConfirmationV3', request, image_type)
     end
 
     def signature_confirmation_label(origin, destination, service_type, image_type, label_type=1,
       api_request = "SignatureConfirmationV3.0Request", options)
       request = confirmation_xml(api_request, origin, destination, service_type, image_type, label_type, options)
       #YES THE API IS THAT STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
-      gateway_commit(:signature, 'SignatureConfirmationV3', request, :ssl, image_type)
+      gateway_commit(:signature, 'SignatureConfirmationV3', request, image_type)
     end
 
 
@@ -24,7 +24,7 @@ module AwesomeUsps
       options = {:weight => 2}
       api_request = "DelivConfirmCertifyV3.0Request"
       request = confirmation_xml(api_request, origin, destination, service_type, image_type, label_type, options)
-      gateway_commit(:delivery_confirmation_certify,'DelivConfirmCertifyV3', request, :ssl, image_type)
+      gateway_commit(:delivery_confirmation_certify,'DelivConfirmCertifyV3', request, image_type)
     end
 
     def canned_signature_confirmation_label_test
@@ -36,7 +36,7 @@ module AwesomeUsps
       options = {:weight => 2}
       api_request = "SigConfirmCertifyV3.0Request"
       request = confirmation_xml(api_request, origin, destination, service_type, image_type, label_type, options)
-      gateway_commit(:signature_confirmation_certify, 'SignatureConfirmationCertifyV3', request, :ssl, image_type)
+      gateway_commit(:signature_confirmation_certify, 'SignatureConfirmationCertifyV3', request, image_type)
     end
 
     private
