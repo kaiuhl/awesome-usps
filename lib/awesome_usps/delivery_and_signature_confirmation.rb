@@ -1,10 +1,10 @@
 module AwesomeUsps
   module DeliveryAndSignatureConfirmation
 
-    def delivery_confirmation_label(origin, destination, service_type, image_type, label_type=1, api_request = "DeliveryConfirmationV3.0Request", options)
+    def delivery_confirmation_label(origin, destination, service_type, image_type, label_type=1, api_request = "DelivConfirmCertifyV3.0Requestt", options)
       request = confirmation_xml(api_request, origin, destination, service_type, image_type, label_type, options)
       #YES THE API IS THAT STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
-      gateway_commit(:delivery, 'DeliveryConfirmationV3', request, image_type)
+      gateway_commit(:delivery, 'DelivConfirmCertifyV3', request, image_type)
     end
 
     def signature_confirmation_label(origin, destination, service_type, image_type, label_type=1,
