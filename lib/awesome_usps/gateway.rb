@@ -6,7 +6,7 @@ module AwesomeUsps
     LIVE_DOMAIN = 'production.shippingapis.com'
     LIVE_RESOURCE = '/ShippingAPI.dll'
 
-    TEST_DOMAIN ='testing.shippingapis.com'
+    TEST_DOMAIN = 'secure.shippingapis.com'#'testing.shippingapis.com'
     TEST_RESOURCE = '/ShippingAPITest.dll'
 
     SSL_DOMAIN = 'secure.shippingapis.com'
