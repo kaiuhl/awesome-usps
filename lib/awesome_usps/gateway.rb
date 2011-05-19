@@ -109,7 +109,7 @@ module AwesomeUsps
     end
 
     def url_path(action)
-      case action
+      case @platform
       when :test
         return  "http://#{TEST_DOMAIN}#{TEST_RESOURCE}"
       when :live

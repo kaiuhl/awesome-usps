@@ -20,8 +20,9 @@ require 'awesome_usps/location'
 module AwesomeUsps
   class USPS
     
-    def initialize(username)
+    def initialize(username, platform=:ssl)
       @username = validate(username)
+	  @platform = platform
     end
     
     def validate(param)
