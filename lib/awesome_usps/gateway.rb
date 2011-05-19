@@ -48,16 +48,16 @@ module AwesomeUsps
       :first_class_mail_certify => "FirstClassMailIntlCertifyResponse"
     }
 
-    def gateway_commit(action, api, request, http_request, image_type="PDF")
+    def gateway_commit(action, api, request, image_type="PDF")
       retries = MAX_RETRIES
       begin
-        url = URI.parse(url_path(http_request))
+        url = URI.parse(url_path(@platform))
         req = Net::HTTP::Post.new(url.path)
         req.set_form_data({'API' => api, 'XML' => request})
         http = Net::HTTP.new(url.host, url.port)
         http.open_timeout = 2
         http.read_timeout = 2
-        if http_request == :ssl
+        if @platform == :ssl
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
@@ -109,7 +109,7 @@ module AwesomeUsps
     end
 
     def url_path(action)
-      case @platform
+      case action
       when :test
         return  "http://#{TEST_DOMAIN}#{TEST_RESOURCE}"
       when :live
