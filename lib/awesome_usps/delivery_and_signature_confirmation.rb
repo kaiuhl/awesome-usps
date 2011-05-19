@@ -1,14 +1,14 @@
 module AwesomeUsps
   module DeliveryAndSignatureConfirmation
 
-    def delivery_confirmation_label(origin, destination, service_type, image_type, label_type=1, api_request = "DeliveryConfirmationV3.0Request", options={})
+    def delivery_confirmation_label(origin, destination, service_type, image_type, label_type=1, api_request = "DeliveryConfirmationV3.0Request", options)
       request = confirmation_xml(api_request, origin, destination, service_type, image_type, label_type, options)
       #YES THE API IS THAT STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
       commit_confirmation_xml(:delivery, 'DeliveryConfirmationV3', request,:ssl, image_type)
     end
 
     def signature_confirmation_label(origin, destination, service_type, image_type, label_type=1,
-      api_request = "SignatureConfirmationV3.0Request", options={})
+      api_request = "SignatureConfirmationV3.0Request", options)
       request = confirmation_xml(api_request, origin, destination, service_type, image_type, label_type, options)
       #YES THE API IS THAT STUPID THAT WE MUST PASS WHAT TYPE OF MIME TYPE!
       commit_confirmation_xml(:signature, 'SignatureConfirmationV3', request, :ssl, image_type)
@@ -44,7 +44,7 @@ module AwesomeUsps
       xm = Builder::XmlMarkup.new
       xm.tag!(api_request, "USERID"=>"#{@username}")
 	  xm.Option(label_type)
-      xm.ImageParameters #Will be used in the future. Is a required tag.
+      xm.ImageParameters(nil) #Will be used in the future. Is a required tag.
       xm.FromName(origin.name)
       xm.FromFirm(origin.firm_name)
       xm.FromAddress1(origin.address1) #Used for an apartment or suite number. Yes the API is a bit fucked.
