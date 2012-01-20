@@ -13,7 +13,7 @@ require 'awesome_usps/electric_merchandis_return'
 require 'awesome_usps/express_mail'
 require 'awesome_usps/address_verification'
 require 'awesome_usps/international_mail_labels'
-# require 'awesome_usps/package'
+require 'awesome_usps/package'
 require 'awesome_usps/location'
 # require 'awesome_usps/international_item'
 
