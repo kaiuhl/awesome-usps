@@ -91,7 +91,7 @@ module AwesomeUsps
         h = {}
         #Check if there was an error in an address element
         if address.search("error") != []
-          Rails.Logger.info("Address number #{i} has the error '#{address.search("description").inner_html}' please fix before continuing")
+          Rails.logger.info("Address number #{i} has the error '#{address.search("description").inner_html}' please fix before continuing")
 
           return "Address number #{i} has the error '#{address.search("description").inner_html}' please fix before continuing"
         end

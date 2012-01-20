@@ -69,11 +69,11 @@ module AwesomeUsps
           retries -= 1
           retry
         else
-          Rails.Logger.warn "The connection to the remote server timed out"
+          Rails.logger.warn "The connection to the remote server timed out"
           return "We appoligize for the inconvience but our USPS service is busy at the moment. To retry please refresh the browser"
         end
       rescue SocketError
-        Rails.Logger.error "There is a socket error with USPS plugin"
+        Rails.logger.error "There is a socket error with USPS plugin"
         return "We appoligize for the inconvience but there is a problem with our server. To retry please refresh the browser"
       end
       case response
@@ -103,7 +103,7 @@ module AwesomeUsps
           parse_tracking(response.body)
         end
       else
-        Rails.Logger.warn("USPS plugin settings are wrong #{response}")
+        Rails.logger.warn("USPS plugin settings are wrong #{response}")
         return "USPS plugin settings are wrong #{response}"
       end
     end

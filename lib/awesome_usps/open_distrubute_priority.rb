@@ -62,7 +62,7 @@ module AwesomeUsps
       end
       parse = Hpricot.parse(xml)/:error
       if parse != []
-        Rails.Logger.info "#{xml}"
+        Rails.logger.info "#{xml}"
         return (Hpricot.parse(xml)/:description).inner_html
       else
         number = Hpricot.parse(xml)/:opendistributeprioritynumber
