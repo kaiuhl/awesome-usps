@@ -64,7 +64,7 @@ module AwesomeUsps
       event_list = []
       parse = Hpricot.parse(xml)/:error
       if parse != []
-        RAILS_DEFAULT_LOGGER.info "#{xml}"
+        Rails.LoggerULT_LOGGER.info "#{xml}"
         return (Hpricot.parse(xml)/:description).inner_html
       else
         return  parse = (Hpricot.parse(xml)/:days).inner_html
@@ -74,7 +74,7 @@ module AwesomeUsps
     def parse_express(xml)
       parse = Hpricot.parse(xml)/:error
       if parse != []
-        RAILS_DEFAULT_LOGGER.info "#{xml}"
+        Rails.LoggerULT_LOGGER.info "#{xml}"
         return (Hpricot.parse(xml)/:description).inner_html
       else
         i= 0
