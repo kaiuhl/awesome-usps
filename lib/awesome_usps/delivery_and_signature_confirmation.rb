@@ -83,7 +83,7 @@ module AwesomeUsps
       end
       parse = Hpricot.parse(xml)/:error
       if parse != []
-        Rails.LoggerULT_LOGGER.info "#{xml}"
+        Rails.Logger.info "#{xml}"
         return (Hpricot.parse(xml)/:description).inner_html
       elsif action == :signature_confirmation_certify || :signature
         number = Hpricot.parse(xml)/:signatureconfirmationnumber

@@ -67,7 +67,7 @@ module AwesomeUsps
       end
       parse = Hpricot.parse(xml)/:error
       if parse != []
-        Rails.LoggerULT_LOGGER.info "#{xml}"
+        Rails.Logger.info "#{xml}"
         return (Hpricot.parse(xml)/:description).inner_html
       else
         label = Hpricot.parse(xml)/:merchandisereturnlabel

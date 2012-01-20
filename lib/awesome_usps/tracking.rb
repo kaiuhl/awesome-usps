@@ -28,7 +28,7 @@ module AwesomeUsps
       event_list = []
       parse = Hpricot.parse(xml)/:trackdetail
       if parse == []
-        Rails.LoggerULT_LOGGER.info "#{xml}"
+        Rails.Logger.info "#{xml}"
         return (Hpricot.parse(xml)/:description).inner_html
       else
         parse.each do |detail|

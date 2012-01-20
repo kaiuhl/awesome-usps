@@ -220,7 +220,7 @@ module AwesomeUsps
       image_type = image_mime(image_type)
       parse = Hpricot.parse(xml)/:error
       if parse != []
-        Rails.LoggerULT_LOGGER.info "#{xml}"
+        Rails.Logger.info "#{xml}"
         return parse.inner_html
       end
       parse = Hpricot.parse(xml).search("#{response.downcase}")
